@@ -6,5 +6,5 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(StorageBufferaManager main.cpp include/Frame.h include/Buffer.h)
+add_executable(StorageBufferaManager main.cc buffer/Frame.h buffer/Buffer.h buffer/BMgr.h storage/DSMgr.cc storage/DSMgr.h include/env.h)
 target_link_libraries(StorageBufferaManager ${GTEST_LIBRARIES} pthread)
