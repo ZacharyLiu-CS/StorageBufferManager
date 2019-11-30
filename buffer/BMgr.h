@@ -4,10 +4,5 @@
 
 #ifndef STORAGEBUFFERAMANAGER_BMGR_H
 #define STORAGEBUFFERAMANAGER_BMGR_H
-class BMgr{
-public:
-    BMgr();
-    int FixPage(int page_id, int prot);
-    void NewPage
-};
+
 #endif //STORAGEBUFFERAMANAGER_BMGR_H

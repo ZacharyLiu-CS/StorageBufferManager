@@ -6,7 +6,9 @@
 #define STORAGEBUFFERAMANAGER_DSMGR_H
 
 #include <string>
+#include <iostream>
 #include "../buffer/Buffer.h"
+
 namespace DataStorageManager {
     class DSMgr {
     public:
@@ -16,9 +18,9 @@ namespace DataStorageManager {
 
         int CloseFile();
 
-        bFrame ReadPage(int page_id);
+        int ReadPage(int page_id, bFrame &read_frame);
 
-        int WritePage(int page_id, bFrame frm);
+        int WritePage(int page_id, bFrame &write_frame);
 
         int Seek(int offset, int pos);
 
@@ -30,13 +32,16 @@ namespace DataStorageManager {
 
         void SetUse(int index, int use_bits);
 
+        int GetUse(int index);
+
     private:
         ~DSMgr();
         FILE * currFile;
         int numPages;
         int pages_use_bit[MAXPAGES];
         int pages_offset[MAXPAGES];
-        int io_count;
+        int read_io_count;
+        int write_io_count;
 
     };
 
