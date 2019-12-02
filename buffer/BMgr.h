@@ -8,6 +8,8 @@
 #include "../include/env.h"
 #include "Buffer.h"
 namespace BufferManager {
+    
+
     class BMgr {
     public:
         BMgr();

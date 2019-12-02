@@ -45,7 +45,3 @@ void BufferManager::BMgr::WriteDirtys(){
 void BufferManager::BMgr::PrintFrame(int frame_id){
 
 }
-
-// Hash Table
-int ftop[DEFBUFSIZE];
-BCB* ptof[DEFBUFSIZE];

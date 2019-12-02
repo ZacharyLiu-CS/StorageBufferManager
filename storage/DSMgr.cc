@@ -3,10 +3,10 @@
 //
 
 #include "DSMgr.h"
-
+#include <memory.h>
 DataStorageManager::DSMgr::DSMgr(){
-    if(this->OpenFile("./datafile.dbf") != 0)
-        this->NewFile("./datafile.dbf");
+    if(this->OpenFile("./data.txt") != 0)
+        this->NewFile("./data.txt");
 
 }
 DataStorageManager::DSMgr::~DSMgr() {
@@ -63,6 +63,7 @@ int DataStorageManager::DSMgr::NewFile(std::string filename) {
     //init the data
     for(int i = 0; i < MAXPAGES; i++){
         bFrame write_page;
+        memset(write_page.field,0,FRAMESIZE);
         sprintf(write_page.field,"%s%d%s","page_id: " ,i , " data: this is just test!");
         this->WritePage(i,write_page);
     }
