@@ -5,8 +5,8 @@
 #include "DSMgr.h"
 #include <memory.h>
 DataStorageManager::DSMgr::DSMgr(){
-    if(this->OpenFile("./data.txt") != 0)
-        this->NewFile("./data.txt");
+    if(this->OpenFile("./data.dbf") != 0)
+        this->NewFile("./data.dbf");
 
 }
 DataStorageManager::DSMgr::~DSMgr() {
@@ -74,7 +74,6 @@ int DataStorageManager::DSMgr::CloseFile(){
     if(fclose(this->currFile))
         return -1;
     else return 0;
-
 }
 
 int DataStorageManager::DSMgr::ReadPage(int page_id, bFrame &read_frame){
