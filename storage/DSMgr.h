@@ -5,16 +5,17 @@
 #ifndef STORAGEBUFFERAMANAGER_DSMGR_H
 #define STORAGEBUFFERAMANAGER_DSMGR_H
 
-#include <string>
-#include <iostream>
 #include "../buffer/Buffer.h"
 
 namespace DataStorageManager {
+
     class DSMgr {
     public:
         DSMgr();
 
         int OpenFile(std::string filename);
+
+        int NewFile(std::string filename);
 
         int CloseFile();
 
@@ -22,7 +23,7 @@ namespace DataStorageManager {
 
         int WritePage(int page_id, bFrame &write_frame);
 
-        int Seek(int offset, int pos);
+        int Seek(long long offset, long long pos);
 
         FILE *GetFile();
 
@@ -30,16 +31,19 @@ namespace DataStorageManager {
 
         int GetNumPages();
 
-        void SetUse(int index, int use_bits);
+        void SetUse(int page_id, int use_bits);
 
-        int GetUse(int index);
+        int GetUse(int page_id);
+
+        int GetIOCount();
+
 
     private:
         ~DSMgr();
         FILE * currFile;
         int numPages;
         int pages_use_bit[MAXPAGES];
-        int pages_offset[MAXPAGES];
+        long long  pages_offset[MAXPAGES];
         int read_io_count;
         int write_io_count;
 

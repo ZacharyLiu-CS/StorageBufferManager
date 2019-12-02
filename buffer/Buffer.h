@@ -7,14 +7,9 @@
 
 #include "../include/env.h"
 
-struct bFrame{
-    char field[FRAMESIZE];
-};
-bFrame buf[DEFBUFSIZE];
-struct  Frame{
+struct Frame{
     int frame_id;
     int offset;
-
 };
 struct BCB{
     BCB();
