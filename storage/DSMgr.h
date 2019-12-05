@@ -42,8 +42,8 @@ namespace DataStorageManager {
         ~DSMgr();
         FILE * currFile;
         int numPages;
-        int pages_use_bit[MAXPAGES];
-        long long  pages_offset[MAXPAGES];
+        int *pages_use_bit;
+        long long  *pages_offset;
         int read_io_count;
         int write_io_count;
 

@@ -10,7 +10,13 @@ DataStorageManager::DSMgr::DSMgr(){
 
 }
 DataStorageManager::DSMgr::~DSMgr() {
-    fclose(this->currFile);
+    this->Seek(0,0);
+    fwrite(&this->numPages,sizeof(int),1,this->currFile);
+    fwrite(this->pages_use_bit,sizeof(int),this->numPages,this->currFile);
+    fwrite(this->pages_offset,sizeof(long long),this->numPages,this->currFile);
+    delete [] this->pages_use_bit;
+    delete [] this->pages_offset;
+    this->CloseFile();
 }
 // OpenFile contain the function of open and read content
 int DataStorageManager::DSMgr::OpenFile(std::string filename){
@@ -24,11 +30,13 @@ int DataStorageManager::DSMgr::OpenFile(std::string filename){
         return -2;
     }
     //read the page_use_bit
+    this->pages_use_bit = (int*)malloc(sizeof(int) * this->numPages);
     if(fread(this->pages_use_bit,sizeof(int),MAXPAGES,this->currFile) != MAXPAGES){
         std::cerr << "failed to load db's pages_use_bit!" << std::endl;
         return -2;
     }
     //read the page_offset
+    this->pages_offset = (long long*)malloc(sizeof(long long) * this->numPages);
     if(fread(this->pages_offset,sizeof(long long),MAXPAGES,this->currFile) != MAXPAGES){
         std::cerr << "failed to load db's pages_offset!" << std::endl;
         return -2;
@@ -48,6 +56,7 @@ int DataStorageManager::DSMgr::NewFile(std::string filename) {
     // write the numPage info
     fwrite(&this->numPages,sizeof(int),1,this->currFile);
 
+    this->pages_use_bit = (int*)malloc(sizeof(int) * this->numPages);
     //init the pages_use_bit and write it to db
     for(int i = 0; i < MAXPAGES; i++)
         this->pages_use_bit[i] = 0;
@@ -56,8 +65,9 @@ int DataStorageManager::DSMgr::NewFile(std::string filename) {
     //init the pages_offset and write it to db
     size_t pos = ftell(this->currFile);
     //init the pages_offset and write it to db
+    this->pages_offset = (long long*)malloc(sizeof(long long) * this->numPages);
     for(int i = 0; i < MAXPAGES; i++)
-        this->pages_offset[i] = 2*pos+ sizeof(pages_offset) + FRAMESIZE*i;
+        this->pages_offset[i] = 3*pos+ sizeof(long long)*MAXPAGES + FRAMESIZE*i;
     fwrite(this->pages_offset,sizeof(long long),MAXPAGES,this->currFile);
 
     //init the data
@@ -114,6 +124,16 @@ FILE *DataStorageManager::DSMgr::GetFile(){
 }
 
 void DataStorageManager::DSMgr::IncNumPages(){
+    realloc(this->pages_offset,sizeof(long long) * (this->numPages+1));
+    realloc(this->pages_use_bit,sizeof(int)*(this->numPages+1));
+    this->pages_use_bit[this->numPages] = 0;
+    this->pages_offset[this->numPages] = pages_offset[this->numPages-1] + FRAMESIZE;
+    long long offset = pages_offset[this->numPages] ;
+    Seek(offset,0);
+    bFrame write_page;
+    memset(write_page.field,0,FRAMESIZE);
+    sprintf(write_page.field,"%s%d%s","page_id: " ,this->numPages , " data: this is just test!");
+    this->WritePage(this->numPages,write_page);
     this->numPages++;
 }
 

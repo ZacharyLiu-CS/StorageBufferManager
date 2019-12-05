@@ -9,7 +9,7 @@
 #include <iostream>
 #include <stdint.h>
 #define MAXPAGES 50000  // define the disk max pages nums
-#define FRAMESIZE 4096  // define the frame max size
+#define FRAMESIZE 100  // define the frame max size
 #define PAGESIZE 4096   // define the page size
 #define DEFBUFSIZE 1024 // define the buffer size
 

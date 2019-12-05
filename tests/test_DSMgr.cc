@@ -58,6 +58,23 @@ TEST(DataStorageManagerTest,WriteCount){
     ASSERT_EQ(100,dsmgr->GetIOCount());
 
 }
+TEST(DataStorageManagerTest,IncNumPages){
+    auto dsmgr = new DataStorageManager::DSMgr();
+    int numpages = dsmgr->GetNumPages();
+    dsmgr->IncNumPages();
+    ASSERT_EQ(numpages+1,dsmgr->GetNumPages());
+    bFrame read_frame;
+    dsmgr->ReadPage(numpages,read_frame);
+    char expetedstr[FRAMESIZE];
+    sprintf(expetedstr,"page_id: %d data: this is just test!",numpages);
+    ASSERT_EQ(0,strcmp(read_frame.field,expetedstr));
+
+    dsmgr->ReadPage(50005,read_frame);
+    sprintf(expetedstr,"page_id: %d data: this is just test!",50005);
+    ASSERT_EQ(0,strcmp(read_frame.field,expetedstr));
+
+
+}
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
