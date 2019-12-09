@@ -11,10 +11,10 @@ struct Frame{
     int frame_id;
     int offset;
 };
-struct BCB{
+struct  BCB{
     BCB();
-    int page_id;
     int frame_id;
+    int page_id;
     int count;
     int dirty;
     BCB *next;

@@ -13,6 +13,8 @@ namespace DataStorageManager {
     public:
         DSMgr();
 
+        ~DSMgr();
+
         int OpenFile(std::string filename);
 
         int NewFile(std::string filename);
@@ -27,7 +29,7 @@ namespace DataStorageManager {
 
         FILE *GetFile();
 
-        void IncNumPages();
+        int IncNumPages();
 
         int GetNumPages();
 
@@ -39,7 +41,7 @@ namespace DataStorageManager {
 
 
     private:
-        ~DSMgr();
+        std::string fileName;
         FILE * currFile;
         int numPages;
         int *pages_use_bit;

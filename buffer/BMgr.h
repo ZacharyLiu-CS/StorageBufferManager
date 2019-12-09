@@ -7,12 +7,13 @@
 
 #include "../include/env.h"
 #include "Buffer.h"
+#include "../storage/DSMgr.h"
 namespace BufferManager {
-    
 
     class BMgr {
     public:
         BMgr();
+        ~BMgr();
 
         // Interface functions
         int FixPage(int page_id, int prot);
@@ -30,7 +31,7 @@ namespace BufferManager {
 
         void RemoveBCB(BCB *ptr, int page_id);
 
-        void RemoveLRUEle(int frid);
+        void RemoveLRUEle(int frame_id);
 
         void SetDirty(int frame_id);
 
@@ -44,6 +45,11 @@ namespace BufferManager {
         // Hash Table
         int ftop[DEFBUFSIZE];
         BCB *ptof[DEFBUFSIZE];
+        bFrame buff_pool[DEFBUFSIZE];
+        std::list<int> priority_queue;
+        DataStorageManager::DSMgr *dsMgr;
+        int num_free;
+        int operation_count,cache_miss_time;
     };
 }
 #endif //STORAGEBUFFERAMANAGER_BMGR_H

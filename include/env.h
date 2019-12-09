@@ -5,9 +5,8 @@
 #ifndef STORAGEBUFFERAMANAGER_ENV_H
 #define STORAGEBUFFERAMANAGER_ENV_H
 
-#include <string>
-#include <iostream>
-#include <stdint.h>
+#include <bits/stdc++.h>
+
 #define MAXPAGES 50000  // define the disk max pages nums
 #define FRAMESIZE 100  // define the frame max size
 #define PAGESIZE 4096   // define the page size
