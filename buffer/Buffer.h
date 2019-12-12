@@ -12,7 +12,6 @@ struct Frame{
     int offset;
 };
 struct  BCB{
-    BCB();
     int frame_id;
     int page_id;
     int count;

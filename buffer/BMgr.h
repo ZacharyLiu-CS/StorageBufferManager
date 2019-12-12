@@ -43,13 +43,13 @@ namespace BufferManager {
 
     private:
         // Hash Table
-        int ftop[DEFBUFSIZE];
-        BCB *ptof[DEFBUFSIZE];
-        bFrame buff_pool[DEFBUFSIZE];
+        int ftop[BUFFERSIZE];
+        BCB *ptof[BUFFERSIZE];
+        bFrame buff_pool[BUFFERSIZE];
         std::list<int> priority_queue;
         DataStorageManager::DSMgr *dsMgr;
         int num_free;
-        int operation_count,cache_miss_time;
+        int operation_count,io_count;
     };
 }
 #endif //STORAGEBUFFERAMANAGER_BMGR_H

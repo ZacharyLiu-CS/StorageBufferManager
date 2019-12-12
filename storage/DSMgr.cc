@@ -32,7 +32,7 @@ int DataStorageManager::DSMgr::OpenFile(std::string filename){
     }
     //read the page_use_bit
     this->pages_use_bit = (int*)malloc(sizeof(int) * this->numPages);
-    if(fread(this->pages_use_bit,sizeof(int),this->numPages,this->currFile) != this->numPages){
+    if(fread(this->pages_use_bit,sizeof(int),this->numPages,this->currFile) != (long unsigned int)this->numPages){
         std::cerr << "failed to load db's pages_use_bit!" << std::endl;
         return -2;
     }

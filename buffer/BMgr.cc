@@ -10,13 +10,16 @@ BufferManager::BMgr::BMgr(){
     // initalize the Hash table
     memset(this->ftop, 0, sizeof(ftop));
     memset(this->ptof, 0, sizeof (ptof));
-    this->num_free = DEFBUFSIZE;
+    this->num_free = BUFFERSIZE;
+    this->operation_count = 0;
+    this->io_count = 0;
+    this->priority_queue = std::list<int>();
     this->dsMgr = new DataStorageManager::DSMgr();
 }
 BufferManager::BMgr::~BMgr() {
     this->WriteDirtys();
     delete this->dsMgr;
-    std::cout << "cache miss rate:\t" << (this->cache_miss_time+0.0)/this->operation_count << std::endl;
+    std::cout << "cache miss rate:\t" << (this->io_count + 0.0) / this->operation_count << std::endl;
 
 }
 // Interface functions
@@ -25,40 +28,54 @@ int BufferManager::BMgr::FixPage(int page_id, int prot){
     while(page_id >= this->dsMgr->GetNumPages())
         FixNewPage();
     BCB *pb = ptof[Hash(page_id)];
+    //try to find it in the buffer
     while(pb) {
         if(pb->page_id == page_id) {
             break;
         }
         pb = pb->next;
     }
-    if(pb == nullptr) {         // page not in buffer
-        int victim = SelectVictim();
-        this->cache_miss_time++;
-        this->dsMgr->ReadPage(page_id, buff_pool[victim]);
-        ftop[victim] = page_id;
-        if(ptof[Hash(page_id)] == nullptr) {
-            ptof[Hash(page_id)] = new BCB();
+    if (pb == nullptr) {
+        int victim_frame_id = SelectVictim();
+        ftop[victim_frame_id] = page_id;
+        //judge whether the ftop is inited
+        auto newBCB = new BCB{victim_frame_id, page_id, 1, prot, nullptr};
+        if (ptof[Hash(page_id)] == nullptr) {
+            ptof[Hash(page_id)] = newBCB;
             pb = ptof[Hash(page_id)];
-            pb->page_id = page_id;
-            pb->frame_id = victim;
-            pb->count = 1;
-            pb->dirty = prot;
-            pb->next = nullptr;
-        }else {
+        } else {
             pb = ptof[Hash(page_id)];
-            while(pb->next != nullptr) {
+            while (pb->next != nullptr)
                 pb = pb->next;
-            }
-            pb->next = new BCB;
+            pb->next = newBCB;
             pb = pb->next;
-            pb->page_id = page_id;
-            pb->frame_id = victim;
-            pb->count = 1;
-            pb->dirty = prot;
-            pb->next = nullptr;
         }
+        if( prot == 0) {
+            this->dsMgr->ReadPage(page_id, buff_pool[pb->frame_id]);
+        }else if(prot == 1){
+            bFrame write_page;
+            sprintf(write_page.field, "%s%d%s", "page_id: ", pb->frame_id, " data: this is just test!--version2");
+            buff_pool[pb->frame_id] = write_page;
+        }
+        this->priority_queue.push_back(pb->frame_id);
+    }else {
+        this->RemoveLRUEle(pb->frame_id);
+        this->priority_queue.push_back(pb->frame_id);
+        if(prot == 1){
+            if(pb->dirty == 1) {
+                this->dsMgr->WritePage(page_id, buff_pool[pb->frame_id]);
+                pb->dirty = 0;
+            }
+            bFrame write_page;
+            sprintf(write_page.field, "%s%d%s", "page_id: ", pb->frame_id, " data: this is just test!--version2");
+            buff_pool[pb->frame_id] = write_page;
+            pb->dirty = 1;
+        }
+
     }
-    this->priority_queue.push_back(pb->frame_id);
+
+
+
     return pb->frame_id;
 }
 void BufferManager::BMgr::FixNewPage(){
@@ -90,13 +107,13 @@ int BufferManager::BMgr::NumFreeFrames(){
 // Internal Functions
 int BufferManager::BMgr::SelectVictim(){
     int nff = this->NumFreeFrames();
-    if(nff > 0) {               // Buffer 有空余
+    if(nff > 0) {               // Buffer has empty
         --num_free;
-        int frame_id = DEFBUFSIZE - nff;
+        int frame_id = BUFFERSIZE - nff;
         return frame_id;
-    }else {                     // Buffer 已满
-        int vic = this->priority_queue.back();
-        int page_id = ftop[vic];
+    }else {                     // Buffer is full
+        int victim_frame_id = this->priority_queue.back();
+        int page_id = ftop[victim_frame_id];
         BCB* pb = ptof[Hash(page_id)];
         while(pb) {
             if(pb->page_id == page_id) {
@@ -108,18 +125,18 @@ int BufferManager::BMgr::SelectVictim(){
             std::cerr << "BMgr: Select Victim failed: BCB not found" << std::endl;
             return -1;
         }
-        if(pb->dirty) {
-
+        if(pb->dirty == 1) {
             this->dsMgr->WritePage(pb->frame_id, buff_pool[pb->frame_id]);
+            std::cout <<"do the write!" << std::endl;
         }
-        RemoveBCB(ptof[Hash(page_id)], page_id);
-        RemoveLRUEle(vic);
-        return vic;
+        this->RemoveBCB(ptof[Hash(page_id)], page_id);
+        this->RemoveLRUEle(victim_frame_id);
+        rebuff_poolturn victim_frame_id;
     }
 
 }
 int BufferManager::BMgr::Hash(int page_id){
-    return page_id % DEFBUFSIZE;
+    return page_id % BUFFERSIZE;
 }
 void BufferManager::BMgr::RemoveBCB(BCB * ptr, int page_id){
     if(ptr == nullptr) {
@@ -176,7 +193,8 @@ void BufferManager::BMgr::UnsetDirty(int frame_id){
 }
 void BufferManager::BMgr::WriteDirtys(){
     // Traverse the BCB list
-    for(int i = 0; i < DEFBUFSIZE; ++i) {
+    std::cout << "actuall we do the write dirtys" <<std::endl;
+    for(int i = 0; i < BUFFERSIZE; ++i) {
         BCB* pb = ptof[i];
         while(pb) {
             if(pb->dirty == 1) {
