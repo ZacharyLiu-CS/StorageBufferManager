@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 TEST(BufferManagerTotalTest,ZipfDistribution){
-    FILE *test_file = fopen("data-5w-50w-zipf.txt","rw");
+    FILE *test_file = fopen("../tests/data-5w-50w-zipf.txt","rw");
     ASSERT_TRUE(test_file != NULL);
     int request_type,request_page;
     auto bmgr = new BufferManager::BMgr();
