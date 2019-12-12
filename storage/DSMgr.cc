@@ -38,7 +38,7 @@ int DataStorageManager::DSMgr::OpenFile(std::string filename){
     }
     //read the page_offset
     this->pages_offset = (long long*)malloc(sizeof(long long) * this->numPages);
-    if(fread(this->pages_offset,sizeof(long long),this->numPages,this->currFile) != this->numPages){
+    if(fread(this->pages_offset,sizeof(long long),this->numPages,this->currFile) !=(long unsigned int) this->numPages){
         std::cerr << "failed to load db's pages_offset!" << std::endl;
         return -2;
     }

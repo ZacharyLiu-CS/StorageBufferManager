@@ -12,14 +12,15 @@ BufferManager::BMgr::BMgr(){
     memset(this->ptof, 0, sizeof (ptof));
     this->num_free = BUFFERSIZE;
     this->operation_count = 0;
-    this->io_count = 0;
     this->priority_queue = std::list<int>();
     this->dsMgr = new DataStorageManager::DSMgr();
 }
 BufferManager::BMgr::~BMgr() {
     this->WriteDirtys();
+    std::cout << "operation count is: " << this->operation_count << std::endl;
+    std::cout << "actual io count is: " << this->dsMgr->GetIOCount() << std::endl;
+    std::cout << "reduce io rate: " << 1 - (this->dsMgr->GetIOCount()+0.0)/this->operation_count << std::endl;
     delete this->dsMgr;
-    std::cout << "cache miss rate:\t" << (this->io_count + 0.0) / this->operation_count << std::endl;
 
 }
 // Interface functions
@@ -127,11 +128,10 @@ int BufferManager::BMgr::SelectVictim(){
         }
         if(pb->dirty == 1) {
             this->dsMgr->WritePage(pb->frame_id, buff_pool[pb->frame_id]);
-            std::cout <<"do the write!" << std::endl;
         }
         this->RemoveBCB(ptof[Hash(page_id)], page_id);
         this->RemoveLRUEle(victim_frame_id);
-        rebuff_poolturn victim_frame_id;
+        return victim_frame_id;
     }
 
 }
@@ -193,7 +193,6 @@ void BufferManager::BMgr::UnsetDirty(int frame_id){
 }
 void BufferManager::BMgr::WriteDirtys(){
     // Traverse the BCB list
-    std::cout << "actuall we do the write dirtys" <<std::endl;
     for(int i = 0; i < BUFFERSIZE; ++i) {
         BCB* pb = ptof[i];
         while(pb) {
@@ -204,6 +203,7 @@ void BufferManager::BMgr::WriteDirtys(){
         }
     }
 }
-void BufferManager::BMgr::PrintFrame(int frame_id){
-    std::cout << buff_pool[frame_id].field << std::endl;
+
+bFrame BufferManager::BMgr::GetFrame(int frame_id){
+    return buff_pool[frame_id];
 }

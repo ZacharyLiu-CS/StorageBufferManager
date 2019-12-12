@@ -39,8 +39,7 @@ namespace BufferManager {
 
         void WriteDirtys();
 
-        void PrintFrame(int frame_id);
-
+	bFrame GetFrame(int frame_id);
     private:
         // Hash Table
         int ftop[BUFFERSIZE];
@@ -49,7 +48,7 @@ namespace BufferManager {
         std::list<int> priority_queue;
         DataStorageManager::DSMgr *dsMgr;
         int num_free;
-        int operation_count,io_count;
+        int operation_count;
     };
 }
 #endif //STORAGEBUFFERAMANAGER_BMGR_H

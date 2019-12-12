@@ -8,16 +8,12 @@
 TEST(BufferManagerTotalTest,ZipfDistribution){
     FILE *test_file = fopen("data-5w-50w-zipf.txt","rw");
     ASSERT_TRUE(test_file != NULL);
-    int read_type,read_page;
-    while(fscanf(test_file,"%d,%d\n",&read_type,&read_page) ==2){
-        bFrame page_content;
-        memset(page_content.field,0,FRAMESIZE);
-        sprintf(page_content.field,"%s%d%s","page_id: " ,read_page , " data: this is just test!");
-        if(read_type == 0)
-            printf("the operation type is read and the page id is: %d\n",read_page);
-        else
-            printf("the operation type is write and the page id is: %d\n",read_page);
+    int request_type,request_page;
+    auto bmgr = new BufferManager::BMgr();
+    while(fscanf(test_file,"%d,%d\n",&request_type,&request_page) ==2){
+        bmgr->FixPage(request_page,request_type);
     }
+    delete bmgr;
 }
 
 int main(int argc, char **argv) {
