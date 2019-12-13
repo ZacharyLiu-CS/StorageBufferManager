@@ -1,6 +1,7 @@
 # CLion projects
 .idea
 
+# .vscode projects
 # CMake Cache Files
 build
 cmake-build-debug
