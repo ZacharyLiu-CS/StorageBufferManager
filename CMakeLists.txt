@@ -5,7 +5,7 @@ add_compile_options(-Wall -Wextra -Wpedantic -g)
 # Locate GTest
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
-add_executable(StorageBufferManager main.cc storage/DSMgr.cc )
+add_executable(StorageBufferManager main.cc storage/DSMgr.cc buffer/BMgr.cc)
 
 add_executable(Test_DSMgr tests/test_DSMgr.cc storage/DSMgr.cc)
 target_link_libraries(Test_DSMgr ${GTEST_LIBRARIES} pthread)

@@ -52,8 +52,6 @@ int DataStorageManager::DSMgr::NewFile(std::string filename) {
     if(this->currFile == NULL)
         return -1;
     this->numPages = MAXPAGES;
-    this->write_io_count = 0;
-    this->read_io_count = 0;
     // write the numPage info
 
     fwrite(&this->numPages,sizeof(int),1,this->currFile);
@@ -79,6 +77,8 @@ int DataStorageManager::DSMgr::NewFile(std::string filename) {
         sprintf(write_page.field,"%s%d%s","page_id: " ,i , " data: this is just test!");
         this->WritePage(i,write_page);
     }
+    this->write_io_count = 0;
+    this->read_io_count = 0;
     return 0;
 }
 
@@ -152,5 +152,13 @@ int DataStorageManager::DSMgr::GetUse(int index) {
 }
 
 int DataStorageManager::DSMgr::GetIOCount() {
-    return write_io_count + read_io_count;
+    return this->write_io_count + this->read_io_count;
+}
+
+int DataStorageManager::DSMgr::GetWriteIOCount() {
+    return this->write_io_count;
+}
+
+int DataStorageManager::DSMgr::GetReadIOCount() {
+    return this->read_io_count;
 }

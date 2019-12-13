@@ -5,6 +5,8 @@
 #include "BMgr.h"
 
 BufferManager::BMgr::BMgr(){
+    std::cout << "Initial Buffer Manager......"<<std::endl;
+    std::cout << "Page Size: " << PAGESIZE << " Cache Capacity: " << BUFFERSIZE << std::endl;
     // initalize the buffer pool
     memset(this->buff_pool, 0, sizeof(buff_pool));
     // initalize the Hash table
@@ -19,6 +21,8 @@ BufferManager::BMgr::~BMgr() {
     this->WriteDirtys();
     std::cout << "operation count is: " << this->operation_count << std::endl;
     std::cout << "actual io count is: " << this->dsMgr->GetIOCount() << std::endl;
+    std::cout << "actual write io count is: " << this->dsMgr->GetWriteIOCount() << std::endl;
+    std::cout << "actual read io count is: " << this->dsMgr->GetReadIOCount() << std::endl;
     std::cout << "reduce io rate: " << 1 - (this->dsMgr->GetIOCount()+0.0)/this->operation_count << std::endl;
     delete this->dsMgr;
 
@@ -58,15 +62,11 @@ int BufferManager::BMgr::FixPage(int page_id, int prot){
             sprintf(write_page.field, "%s%d%s", "page_id: ", pb->frame_id, " data: this is just test!--version2");
             buff_pool[pb->frame_id] = write_page;
         }
-        this->priority_queue.push_back(pb->frame_id);
+        this->priority_queue.push_front(pb->frame_id);
     }else {
         this->RemoveLRUEle(pb->frame_id);
-        this->priority_queue.push_back(pb->frame_id);
+        this->priority_queue.push_front(pb->frame_id);
         if(prot == 1){
-            if(pb->dirty == 1) {
-                this->dsMgr->WritePage(page_id, buff_pool[pb->frame_id]);
-                pb->dirty = 0;
-            }
             bFrame write_page;
             sprintf(write_page.field, "%s%d%s", "page_id: ", pb->frame_id, " data: this is just test!--version2");
             buff_pool[pb->frame_id] = write_page;

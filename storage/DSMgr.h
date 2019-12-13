@@ -39,6 +39,9 @@ namespace DataStorageManager {
 
         int GetIOCount();
 
+        int GetWriteIOCount();
+
+        int GetReadIOCount();
 
     private:
         std::string fileName;
