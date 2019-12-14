@@ -14,16 +14,17 @@ BufferManager::BMgr::BMgr(){
     memset(this->ptof, 0, sizeof (ptof));
     this->num_free = BUFFERSIZE;
     this->operation_count = 0;
+    this->hit_count = 0;
     this->priority_queue = std::list<int>();
     this->dsMgr = new DataStorageManager::DSMgr();
 }
 BufferManager::BMgr::~BMgr() {
     this->WriteDirtys();
     std::cout << "operation count is: " << this->operation_count << std::endl;
-    std::cout << "actual io count is: " << this->dsMgr->GetIOCount() << std::endl;
+    std::cout << "actual io count is: " << this->dsMgr->GetIOCount()<<"  reduce io rate: " << 1 - (this->dsMgr->GetIOCount()+0.0)/this->operation_count << std::endl;
     std::cout << "actual write io count is: " << this->dsMgr->GetWriteIOCount() << std::endl;
     std::cout << "actual read io count is: " << this->dsMgr->GetReadIOCount() << std::endl;
-    std::cout << "reduce io rate: " << 1 - (this->dsMgr->GetIOCount()+0.0)/this->operation_count << std::endl;
+    std::cout << "cache hit time is: " << this->hit_count << " cache hit rate: " << (this->hit_count + 0.0)/this->operation_count << std::endl;
     delete this->dsMgr;
 
 }
@@ -64,6 +65,7 @@ int BufferManager::BMgr::FixPage(int page_id, int prot){
         }
         this->priority_queue.push_front(pb->frame_id);
     }else {
+        this->hit_count ++;
         this->RemoveLRUEle(pb->frame_id);
         this->priority_queue.push_front(pb->frame_id);
         if(prot == 1){

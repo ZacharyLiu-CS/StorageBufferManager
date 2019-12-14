@@ -49,6 +49,7 @@ namespace BufferManager {
         DataStorageManager::DSMgr *dsMgr;
         int num_free;
         int operation_count;
+        int hit_count;
     };
 }
 #endif //STORAGEBUFFERAMANAGER_BMGR_H
