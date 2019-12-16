@@ -91,7 +91,7 @@ int DataStorageManager::DSMgr::CloseFile(){
 int DataStorageManager::DSMgr::ReadPage(int page_id, bFrame &read_frame){
     long long offset = this->pages_offset[page_id];
     fseek(currFile, offset, SEEK_SET);
-    if(fread(&read_frame, sizeof (read_frame), 1, currFile) != 1) {
+    if(fread(&read_frame, sizeof(read_frame), 1, currFile) != 1) {
         std::cerr << "DSMgr: Read page failed" << std::endl;
         return -1;
     }
